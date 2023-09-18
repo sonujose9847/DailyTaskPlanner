@@ -1,0 +1,94 @@
+﻿@page
+@model DailyTaskPlanner.Pages.DailyTask.IndexModel
+@{
+}
+
+<br />
+<h2>
+    Task List
+</h2>
+<form method="post" >
+    <input type="date" class="form-control" required id="tskDate" name="tskDate" onchange="myFunction()" value="@Model.crntDate" style="width:200px;background-color:lightgrey;border-color:darkslateblue" />
+<br />
+<br />
+   
+<br />
+    <table class="table-bordered align-middle table-striped">
+    <thead>
+        <tr>
+            <th>Order</th>
+            <th>Task</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < 5; i++)
+        {
+            int j = 0;
+            <tr>
+                    <td style="width:10px;align-content:center">
+                        <input type="text" readonly style="width:20px;border:none;" id="tskOrder"  name="tskOrder@(i)" value=@(i + 1)>
+                       
+                   </td>
+
+                @if (Model.tskCount > 0)
+                {
+                 foreach(var item in Model.taskInfos)
+                    {
+                        @if ((Convert.ToInt32(item.TaskOrder) == (i + 1)) && (@Model.crntDate == item.TargetDate))
+                        {
+                            j = 1;
+                                <td> <input type="text" class="form-control" id="txtTask@(i)" name="txtTask@(i)" value=@item.Task></td>
+                                <td><input type="checkbox" style="margin:15px" id="chkTask@(i)" name="chkTask@(i)" @(item.Status ? "checked='checked'" : "")> </td>
+                                <input type="hidden" style="width:0px;border:none;" id="taskId" name="taskId@(i)" value=@item.TaskId>
+                       }
+                       
+                    }
+                     @if(j==0)
+                    {
+                            <td> <input type="text" class="form-control" id="txtTask@(i)" name="txtTask@(i)"></td>
+                            <td><input type="checkbox" style="margin:15px" id="chkTask@(i)" name="chkTask@(i)" @(false ? "checked='checked'" : "")> </td>
+                    }
+                }
+                else
+                {
+                        <td> <input type="text" class="form-control" id="txtTask@(i)" name="txtTask@(i)"></td>
+                        <td><input type="checkbox" style="margin:15px" id="chkTask@(i)" name="chkTask@(i)" @(false ? "checked='checked'" : "")> </td>
+                }
+
+            </tr>
+
+        }
+    </tbody>
+     
+</table>
+<br />
+
+    <br />
+    <input type="submit" name="save" value="Save"/>
+</form>
+
+<script type="text/javascript">
+    window.onbeforeunload = function () {
+        sessionStorage.setItem("tskdate", $('#tskDate').val());
+    }
+    window.onload = function () {
+
+        var tskdate = sessionStorage.getItem("tskdate");
+        if (tskdate !== null) $('#tskdate').val("tskdate");
+      
+    }
+    function myFunction() {
+        var taskdate = document.getElementById("tskDate").value;
+        $.ajax({
+            type: 'GET',
+            url: '?handler=FindTask',
+            data: { taskdate },
+            success: function () {
+              
+            },
+            error: function () { alert('Error'); }
+
+        });
+    }  
+</script>
